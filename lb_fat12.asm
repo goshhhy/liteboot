@@ -6,34 +6,38 @@ jmp short init
 nop
 
 bpb:
-bpb_oem:   rb 8
-bpb_bps:   rb 2
-bpb_spc:   rb 1
-bpb_res:   rb 2
-bpb_nfat:  rb 1
-bpb_ndir:  rb 2
-bpb_nsec:  rb 2
-bpb_mtype: rb 1
-bpb_spf:   rb 2
-bpb_spt:   rb 2
-bpb_nhead: rb 2
-bpb_nhide: rb 4
-bpb_lsec:  rb 4
+bpb_oem:   db "liteboot"
+bpb_bps:   dw 512
+bpb_spc:   db 1
+bpb_res:   dw 1
+bpb_nfat:  db 1
+bpb_ndir:  dw 224
+bpb_nsec:  dw 2880
+bpb_mtype: db 0xf0
+bpb_spf:   dw 9
+bpb_spt:   dw 18
+bpb_nhead: dw 2
+bpb_nhide: dq 0
+bpb_lsec:  dq 0
 ebr:
-ebr_drv:   rb 1
-ebr_flags: rb 1
-ebr_sig:   rb 1
-ebr_ser:   rb 4
-ebr_label: rb 11
-ebr_ident: rb 8
+ebr_drv:   db 0
+ebr_flags: db 0
+ebr_sig:   db 41
+ebr_ser:   db "ltbt"
+ebr_label: db "liteboot   "
+ebr_ident: db "fat12   "
 ; API provided from boot sector to second stage
 bapi:
 bapi_loadfile: dw loadfile
 
 init:
+    xchg bx,bx
     push cs
-    pop es
+    pop ax
+    mov ds, ax
+    mov es, ax
     call cls
+    ; print string
     mov al,0
     mov ah,0x13
     mov dx,0
@@ -42,6 +46,16 @@ init:
     mov cx,8
     mov bp,pstring
     int 0x10
+    ; copy fat into ram at 0x1000
+    mov ah, 0x02
+    mov al, [bpb_spf]
+    mov ch, 0
+    mov cl, 2
+    mov dh, 0
+    mov dl, 0
+    mov bx, 0x1000
+    int 0x13
+
 
 hloop:
     hlt
@@ -66,8 +80,7 @@ cls:
 
 ; data
 
-pstring: db "liteboot"
-bsident: db "fat12   "
+pstring: db "liteboat"
 
 ; end
 

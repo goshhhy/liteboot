@@ -1,0 +1,5 @@
+display_library: wx, options="gui_debug"
+floppya: 1_44="flop.img", status=inserted
+boot: floppy
+cpu: ips=1000000
+magic_break: enabled=1
