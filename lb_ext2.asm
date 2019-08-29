@@ -1,5 +1,3 @@
-; liteboot boot sector for fat12
-; 
 format binary
 use16
 
@@ -19,8 +17,8 @@ bpb_mtype: db 0xf0
 bpb_spf:   dw 9
 bpb_spt:   dw 18
 bpb_nhead: dw 2
-bpb_nhide: dd 0
-bpb_lsec:  dd 0
+bpb_nhide: dq 0
+bpb_lsec:  dq 0
 ebr:
 ebr_drv:   db 0
 ebr_flags: db 0
@@ -48,18 +46,15 @@ init:
     mov cx,8
     mov bp,pstring
     int 0x10
-
-    ; copy fat into ram at 0x5000
+    ; copy fat into ram at 0x1000
     mov ah, 0x02
     mov al, [bpb_spf]
     mov ch, 0
     mov cl, 2
     mov dh, 0
     mov dl, 0
-    mov bx, 0x5000
+    mov bx, 0x1000
     int 0x13
-
-
 
 
 hloop:
@@ -85,7 +80,7 @@ cls:
 
 ; data
 
-pstring: db "litebootbin"
+pstring: db "liteboat"
 
 ; end
 
